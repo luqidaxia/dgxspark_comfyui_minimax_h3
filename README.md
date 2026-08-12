@@ -1,6 +1,6 @@
 # DGX Spark ComfyUI + MiniMax H3 — One-Click Deploy
 
-[🇨🇳 中文版](#中文版) | [📊 Benchmark](BENCHMARK.md) | [Gitee Mirror](https://gitee.com/alexlu0912_admin/dgxspark_comfyui_minimax_h3)
+[🇨🇳 中文版](#中文版) | [📊 Benchmark](BENCHMARK.md) | [🔄 Gitee Mirror](https://gitee.com/alexlu0912_admin/dgxspark_comfyui_minimax_h3) | [🐙 GitHub](https://github.com/luqidaxia/dgxspark_comfyui_minimax_h3)
 
 One-click deploy MiniMax H3 video generation on a single NVIDIA DGX Spark (GB10).
 
@@ -288,7 +288,7 @@ INSTALL_DIR=/mnt/bigdisk/minnimax-h3 bash deploy_from_scratch.sh
 
 # DGX Spark 一键部署 ComfyUI + MiniMax H3
 
-[English](#) | [📊 测速报告](BENCHMARK.md) | [Gitee 仓库](https://gitee.com/alexlu0912_admin/dgxspark_comfyui_minimax_h3)
+[English](#dgx-spark-comfyui--minimax-h3--one-click-deploy) | [📊 测速报告](BENCHMARK.md) | [🌐 GitHub Mirror](https://github.com/luqidaxia/dgxspark_comfyui_minimax_h3) | [Gitee 仓库](https://gitee.com/alexlu0912_admin/dgxspark_comfyui_minimax_h3)
 
 在单台 NVIDIA DGX Spark (GB10) 上一键部署 MiniMax H3 视频生成环境。
 
