@@ -403,7 +403,7 @@ def scratch_hf_weights():
         info("已下载，跳过"); scratch_list_models(); return
 
     items = [
-        ("diffusion_models",    "2 文件",  "~25 GB"),
+        ("diffusion_models",    "fl2va+ref2va",  "~40 GB"),
         ("text_encoders",       "nvFP4",   "~15 GB"),
         ("text_encoders/H3",    "Heretic", "~32 GB"),
         ("vae",                 "video+audio", "~5.5 GB"),
@@ -414,7 +414,8 @@ def scratch_hf_weights():
     for cat, detail, size in items:
         print(f"    {dim('•')} {cat:<22} {dim(detail):<12} {size}")
     print(f"\n  {bold('总大小: ~91 GB')}")
-    print(f"  {dim('支持断点续传')}\n")
+    print(f"  {dim('支持断点续传')}")
+    print(f"  {dim('提示：扩散模型 + VAE 也可从 ModelScope 直连下载（国内更快），见 I2V.md 第 4 节。')}\n")
     if not ask("开始下载？"):
         print(f"\n  {dim('跳过。')}\n"); return
 

@@ -34,6 +34,7 @@
 | 工作流 | 类型 | 节点数 | 文本编码器 | 超分 | 推荐场景 |
 |--------|------|--------|-----------|------|----------|
 | `h3-dense-baseline.json` | T2V/I2V | 14 | Heretic INT8 | ❌ | ⭐ **入门首选** |
+| `h3-i2v-firstframe-enhanced.json` | I2V | 21 | Heretic INT8 | ✅ | ⭐ **首帧驱动图生视频** |
 | `h3-fullstack.json` | T2V/I2V | 16 | Heretic INT8 | ❌ | 完整管线基础版 |
 | `h3-enhanced-fullstack.json` | T2V/I2V | 20 | Heretic INT8 | ✅ | 高质量图生视频 |
 | `h3-enhanced-fullstack-stockte.json` | T2V/I2V | 20 | 官方 nvFP4 | ✅ | 同上，用官方编码器 |
@@ -92,6 +93,45 @@
 
 ---
 
+### h3-i2v-firstframe-enhanced.json
+
+```
+⭐ I2V 首帧驱动 — 完整加速栈 + 2× 超分 (640×360 → 720p)
+```
+
+| 属性 | 值 |
+|------|-----|
+| 类型 | 图生视频（I2V 首帧驱动） |
+| 节点数 | 21 |
+| 文本编码器 | Heretic INT8 ConvRot |
+| 核心节点 | `MiniMaxH3ImageToVideo` (Node #104) + `LoadImage` (Node #137) |
+| 扩散模型 | `minimax_h3_fl2va_pruned_int8_convrot`（fl2va） |
+| 默认分辨率 | 640×360 → 2× 超分 → 1280×720 |
+
+**结构**:
+
+```
+LoadImage #137 (首帧图) ──→ MiniMaxH3ImageToVideo #104 → Spectrum → 超分 → 输出
+                                 ↑
+H3ModelLoader ──────────────────→ |  (fl2va 扩散模型)
+H3CLIPLoader (Heretic) ─────────→ |
+                              (first_frame 锚定第 0 帧)
+```
+
+**使用方法**:
+
+1. 把首帧图放到 `ComfyUI/input/first_frame.png`
+2. 加载工作流，替换 Node #137 的图片名
+3. 修改 Node #104 的 `prompt`（描述从首帧演化的画面）
+4. 可选：再连一张图到 `last_frame` 实现「首尾帧中间过渡」
+5. Queue Prompt
+
+**与 T2V 的关系**: 不接 `first_frame`/`last_frame` 时，该节点即退化为纯文生视频（T2V）。
+
+**与 R2V 的区别**: I2V 把图当作「关键帧」锚定第 0 帧（fl2va 模型）；R2V 把图当作「参考」用 `<Picture i>` 标签引用（ref2va 模型）。详见 [I2V.md](I2V.md)。
+
+---
+
 ### h3-dense-baseline.json
 
 ```
@@ -120,10 +160,12 @@ H3CLIPLoader ↗          ↑
 - 快速验证 prompt 效果
 - 了解最基础的节点连接方式
 
-**如何使用图生视频模式**:
+**如何使用图生视频模式（I2V 首帧驱动）**:
 - 加载 `LoadImage` 节点（右键画布 → Add Node → image → LoadImage）
-- 将图片输出连接到 Node #104 的 `image` 输入
-- prompt 中可以用 `<Picture>` 引用该图
+- 将图片输出连接到 Node #104 的 `first_frame` 输入（首帧锚定第 0 帧）
+- 可选：再连一张图到 `last_frame` 输入（尾帧锚定末帧，中间自动过渡）
+- 无需在 prompt 中用 `<Picture>` 标签（那是 R2V 参考图的用法，见下文）
+- 完整说明见 [I2V.md](I2V.md)
 
 ---
 

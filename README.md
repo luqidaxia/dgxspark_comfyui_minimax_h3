@@ -1,6 +1,6 @@
 # DGX Spark ComfyUI + MiniMax H3 — One-Click Deploy
 
-[🇨🇳 中文版](#中文版) | [📊 Benchmark](BENCHMARK.md) | [🔄 Gitee Mirror](https://gitee.com/alexlu0912_admin/dgxspark_comfyui_minimax_h3) | [🐙 GitHub](https://github.com/luqidaxia/dgxspark_comfyui_minimax_h3)
+[🇨🇳 中文版](#中文版) | [📊 Benchmark](BENCHMARK.md) | [🎬 I2V 图生视频](I2V.md) | [🔄 Gitee Mirror](https://gitee.com/alexlu0912_admin/dgxspark_comfyui_minimax_h3) | [🐙 GitHub](https://github.com/luqidaxia/dgxspark_comfyui_minimax_h3)
 
 One-click deploy MiniMax H3 video generation on a single NVIDIA DGX Spark (GB10).
 
@@ -152,7 +152,7 @@ Pipeline: probe → install deps → RoCE transfer ~145 GB → config symlinks �
 | Model | Size | Directory | Purpose |
 |---|---|---|---|
 | `minimax_h3_fl2va_pruned_int8_convrot.safetensors` | 20 GB | `diffusion_models/` | T2V / I2V |
-| `minimax_h3_ref2va_pruned_int8_convrot.safetensors` | 5 GB | `diffusion_models/` | Reference I2V |
+| `minimax_h3_ref2va_pruned_int8_convrot.safetensors` | 20 GB | `diffusion_models/` | Reference I2V (R2V) |
 | `qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors` | 15 GB | `text_encoders/` | nvFP4 quantized (default) |
 | `qwen3vl_32b_minimax_h3_int8_convrot.safetensors` | 26 GB | `text_encoders/` | INT8 ConvRot |
 | `qwen3vl_32b_minimax_h3_bf16.safetensors` | 48 GB | `text_encoders/` | BF16 full precision |
@@ -179,10 +179,13 @@ Pipeline: probe → install deps → RoCE transfer ~145 GB → config symlinks �
 | JSON | Type | Notes |
 |---|---|---|
 | `h3-dense-baseline.json` | Text-to-Video | ⭐ Simplest, start here |
+| `h3-i2v-firstframe-enhanced.json` | Image-to-Video (first frame) + upscale | ⭐ I2V first-frame driven, 720p |
 | `h3-enhanced-fullstack.json` | Image-to-Video + upscale | Full pipeline |
 | `h3-multishot-enhanced.json` | Multi-shot video | Multiple clips at once |
 | `h3-r2v-heretic-enhanced.json` | Reference → Video | Needs reference image |
 | `h3-heretic-unbox-test.json` | Heretic TE test | Verify Heretic encoder |
+
+> 🎬 I2V（首帧驱动）完整说明、依赖与下载方式见 **[I2V.md](I2V.md)**。
 
 ### Prompt Format
 
@@ -288,7 +291,7 @@ INSTALL_DIR=/mnt/bigdisk/minnimax-h3 bash deploy_from_scratch.sh
 
 # DGX Spark 一键部署 ComfyUI + MiniMax H3
 
-[English](#dgx-spark-comfyui--minimax-h3--one-click-deploy) | [📊 测速报告](BENCHMARK.md) | [🌐 GitHub Mirror](https://github.com/luqidaxia/dgxspark_comfyui_minimax_h3) | [Gitee 仓库](https://gitee.com/alexlu0912_admin/dgxspark_comfyui_minimax_h3)
+[English](#dgx-spark-comfyui--minimax-h3--one-click-deploy) | [📊 测速报告](BENCHMARK.md) | [🎬 I2V 图生视频](I2V.md) | [🌐 GitHub Mirror](https://github.com/luqidaxia/dgxspark_comfyui_minimax_h3) | [Gitee 仓库](https://gitee.com/alexlu0912_admin/dgxspark_comfyui_minimax_h3)
 
 在单台 NVIDIA DGX Spark (GB10) 上一键部署 MiniMax H3 视频生成环境。
 
@@ -440,7 +443,7 @@ bash deploy_to_new_spark.sh 192.168.22.161 10.10.12.21 你的密码
 | 模型文件 | 大小 | 目录 | 用途 |
 |---|---|---|---|
 | `minimax_h3_fl2va_pruned_int8_convrot.safetensors` | 20 GB | `diffusion_models/` | 文生视频 / 图生视频 |
-| `minimax_h3_ref2va_pruned_int8_convrot.safetensors` | 5 GB | `diffusion_models/` | 参考图生视频 |
+| `minimax_h3_ref2va_pruned_int8_convrot.safetensors` | 20 GB | `diffusion_models/` | 参考图生视频 (R2V) |
 | `qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors` | 15 GB | `text_encoders/` | nvFP4 量化（默认） |
 | `qwen3vl_32b_minimax_h3_int8_convrot.safetensors` | 26 GB | `text_encoders/` | INT8 ConvRot |
 | `qwen3vl_32b_minimax_h3_bf16.safetensors` | 48 GB | `text_encoders/` | BF16 全精度 |
@@ -467,10 +470,13 @@ bash deploy_to_new_spark.sh 192.168.22.161 10.10.12.21 你的密码
 | JSON 文件 | 类型 | 说明 |
 |---|---|---|
 | `h3-dense-baseline.json` | 文生视频 | ⭐ 入门首选，最简单 |
+| `h3-i2v-firstframe-enhanced.json` | 图生视频（首帧驱动）+ 超分 | ⭐ I2V 首帧驱动，720p |
 | `h3-enhanced-fullstack.json` | 图生视频 + 超分 | 完整管线 |
 | `h3-multishot-enhanced.json` | 多镜头视频 | 一次生成多个片段 |
 | `h3-r2v-heretic-enhanced.json` | 参考图 → 视频 | 需要参考图 |
 | `h3-heretic-unbox-test.json` | Heretic TE 测试 | 验证 Heretic 编码器 |
+
+> 🎬 I2V（首帧驱动）完整说明、依赖与下载方式见 **[I2V.md](I2V.md)**。
 
 ### 提示词格式
 

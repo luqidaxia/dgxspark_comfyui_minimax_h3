@@ -62,14 +62,17 @@ wget --tries=3 --timeout=60 --progress=dot:giga \
 > 这三个文件通过 modelscope CLI 下载至 `/root/.cache/modelscope/`，
 > 然后在 models 目录下创建 symlink。如果在新机器部署可直接从 ModelScope 重新下载。
 
-### 3.3 项目自带模型（从 keys-heretic 仓库）
+### 3.3 扩散模型 + VAE（从 HF 权重包 / ModelScope 下载）
 
-| 文件 | 大小 | 目录 |
-|------|------|------|
-| `minimax_h3_fl2va_pruned_int8_convrot.safetensors` | 20 GB | `models/diffusion_models/` |
-| `minimax_h3_video_vae_fp16.safetensors` | 4.9 GB | `models/vae/` |
-| `minimax_h3_audio_vae_fp32.safetensors` | 578 MB | `models/vae/` |
-| `RealESRGAN_x2plus.pth` | 64 MB | `models/upscale_models/` |
+| 文件 | 大小 | 目录 | 用途 |
+|------|------|------|------|
+| `minimax_h3_fl2va_pruned_int8_convrot.safetensors` | 20 GB | `models/diffusion_models/` | T2V / I2V（首尾帧驱动） |
+| `minimax_h3_ref2va_pruned_int8_convrot.safetensors` | 20 GB | `models/diffusion_models/` | R2V（参考图驱动） |
+| `minimax_h3_video_vae_fp16.safetensors` | 4.9 GB | `models/vae/` | 视频编解码（三种模式共用） |
+| `minimax_h3_audio_vae_fp32.safetensors` | 578 MB | `models/vae/` | 音频编解码（R2V 必需） |
+| `RealESRGAN_x2plus.pth` | 64 MB | `models/upscale_models/` | 视频 2× 超分 |
+
+> I2V（图生视频）能力的完整说明、依赖与下载方式见 **[I2V.md](I2V.md)**。
 
 ---
 
@@ -234,6 +237,9 @@ wget -O ComfyUI/models/text_encoders/H3/{file} https://huggingface.co/ethanfel/Q
 #      vae/minimax_h3_audio_vae_fp32.safetensors
 #      upscale_models/RealESRGAN_x2plus.pth
 #      upscale_models/RealESRGAN_x4plus.pth
+#   d) 备选：扩散模型 + VAE 也可从 ModelScope 直连下载（国内更快，无需代理），
+#      详见 I2V.md 第 4 节。fl2va(20GB) + ref2va(20GB) + video_vae + audio_vae
+#      均可在 modelscope.cn/models/Comfy-Org/MiniMax-H3 找到。
 
 # 8. 创建工作流目录，复制 JSON
 mkdir -p workflows
@@ -257,6 +263,7 @@ python3 main.py --listen 0.0.0.0 --port 8188 --reserve-vram 8
 | 工作流 | 用途 |
 |--------|------|
 | `h3-dense-baseline.json` | ✅ 文生视频（最简单，最推荐入门） |
+| `h3-i2v-firstframe-enhanced.json` | ✅ I2V 首帧驱动图生视频 + 超分（720p） |
 | `h3-enhanced-fullstack.json` | 图生视频 + 超分 |
 | `h3-multishot-enhanced.json` | 多镜头视频 |
 | `h3-r2v-heretic-enhanced.json` | 参考图 → 视频 |

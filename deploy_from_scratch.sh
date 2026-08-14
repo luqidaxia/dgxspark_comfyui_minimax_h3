@@ -165,7 +165,7 @@ PYEOF
         echo ""
         echo "  ┌──────────────────────────────────────────┐"
         echo "  │  下载内容：                                │"
-        echo "  │  • diffusion_models (2 文件)  ~25 GB       │"
+        echo "  │  • diffusion_models (fl2va+ref2va)  ~40 GB  │"
         echo "  │  • text_encoders (nvFP4)      ~15 GB       │"
         echo "  │  • text_encoders/H3 (Heretic)  ~32 GB      │"
         echo "  │  • vae (video + audio)         ~5.5 GB     │"
@@ -173,6 +173,8 @@ PYEOF
         echo "  │  • 其他辅助文件                ~13 GB      │"
         echo "  └──────────────────────────────────────────┘"
         echo ""
+        info "提示：扩散模型 + VAE（fl2va/ref2va 各 20GB、video/audio VAE）"
+        info "      也可从 ModelScope 直连下载（国内更快、无需代理），见 I2V.md 第 4 节。"
 
         $PY -m huggingface_hub.cli.hf download "${HF_WEIGHTS}" \
             --repo-type model \
