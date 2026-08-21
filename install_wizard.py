@@ -274,9 +274,15 @@ def step_comfyui_and_nodes():
         src = tmp / src_part
         dst = cfg.cn_dir / "ComfyUI_sol-attn_Blackwell"
         if src.exists():
-            dst.mkdir(parents=True, exist_ok=True)
-            for f in src.iterdir():
-                shutil.copy2(f, dst / f.name)
+            # 递归复制，兼容 vendor 包里的子目录（如 sol_attn/），且可安全重跑
+            for f in src.rglob("*"):
+                rel = f.relative_to(src)
+                tgt = dst / rel
+                if f.is_dir():
+                    tgt.mkdir(parents=True, exist_ok=True)
+                else:
+                    tgt.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(f, tgt)
     ports_dir = cfg.cn_dir / "h3_sol_engine_ports"
     ports_dir.mkdir(parents=True, exist_ok=True)
     for py_file in ["h3_fbc_node.py", "h3_vae_batch.py"]:
@@ -432,7 +438,7 @@ for msg in snapshot_download(
 ):
     if msg.strip(): print(msg, flush=True)
 """
-    r = subprocess.run([py, "-c", script], timeout=7200)
+    r = subprocess.run([py, "-c", script], timeout=None)
     if r.returncode == 0:
         flag.touch()
         info(f"下载完成 ({timedelta(seconds=int(time.time()-start))}) {ok()}")
@@ -470,7 +476,7 @@ def scratch_modelscope():
 from modelscope.hub.snapshot_download import snapshot_download
 snapshot_download("Comfy-Org/MiniMax-H3", cache_dir="/root/.cache/modelscope",
     allow_patterns=["text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors"])
-"""])
+"""], timeout=None)
     info(f"INT8 {ok()} ({timedelta(seconds=int(time.time()-start))})")
     info("BF16 (48 GB)...")
     start = time.time()
@@ -478,7 +484,7 @@ snapshot_download("Comfy-Org/MiniMax-H3", cache_dir="/root/.cache/modelscope",
 from modelscope.hub.snapshot_download import snapshot_download
 snapshot_download("Comfy-Org/MiniMax-H3", cache_dir="/root/.cache/modelscope",
     allow_patterns=["text_encoders/qwen3vl_32b_minimax_h3_bf16.safetensors"])
-"""])
+"""], timeout=None)
     info(f"BF16 {ok()} ({timedelta(seconds=int(time.time()-start))})")
     flag.parent.mkdir(parents=True, exist_ok=True)
     flag.touch()

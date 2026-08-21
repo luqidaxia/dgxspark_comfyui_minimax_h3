@@ -176,11 +176,18 @@ PYEOF
         info "提示：扩散模型 + VAE（fl2va/ref2va 各 20GB、video/audio VAE）"
         info "      也可从 ModelScope 直连下载（国内更快、无需代理），见 I2V.md 第 4 节。"
 
-        $PY -m huggingface_hub.cli.hf download "${HF_WEIGHTS}" \
-            --repo-type model \
-            --local-dir "${MODEL_DIR}" \
-            --local-dir-use-symlinks False 2>&1 && \
-            touch "$FLAG_FILE" || error "HF 权重下载失败，请检查网络或设置 PROXY=... 后重试"
+        $PY << PYEOF
+from huggingface_hub import snapshot_download
+snapshot_download(
+    "${HF_WEIGHTS}",
+    repo_type="model",
+    local_dir="${MODEL_DIR}",
+    local_dir_use_symlinks=False,
+    resume_download=True,
+)
+print("HF weights download complete")
+PYEOF
+        touch "$FLAG_FILE" || error "HF 权重下载失败，请检查网络或设置 PROXY=... 后重试"
     fi
 
     # 展平可能的目录嵌套 (hf download 有时会造出 xxx/xxx/)
