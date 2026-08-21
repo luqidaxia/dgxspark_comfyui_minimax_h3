@@ -279,6 +279,18 @@ INSTALL_DIR=/mnt/bigdisk/minnimax-h3 bash deploy_from_scratch.sh
 
 ---
 
+## 🙏 Acknowledgments
+
+Special thanks to [@JasonShao](https://gitee.com/wltiger) for reporting [issue #IK9PZK](https://gitee.com/alexlu0912_admin/dgxspark_comfyui_minimax_h3/issues/IK9PZK), which identified three bugs in the deployment scripts:
+
+1. `install_wizard.py` — model downloads were killed by a hard `timeout=600`/`7200` (fixed: `timeout=None`)
+2. `install_wizard.py` — `IsADirectoryError` when copying the `sol_attn/` subdirectory (fixed: recursive copy)
+3. `deploy_from_scratch.sh` — nonexistent module path `python -m huggingface_hub.cli.hf` (fixed: `snapshot_download`)
+
+All three have been fixed and shipped in commit `1a0362a`. Thanks again for the detailed report and locally-verified fixes! 🙏
+
+---
+
 *Maintained by [@alexlu0912_admin](https://gitee.com/alexlu0912_admin) · MIT License*
 
 ---
@@ -567,6 +579,18 @@ INSTALL_DIR=/mnt/bigdisk/minnimax-h3 bash deploy_from_scratch.sh
 - [ModelScope: Comfy-Org/MiniMax-H3](https://modelscope.cn/models/Comfy-Org/MiniMax-H3)
 - [NVIDIA DGX Spark](https://www.nvidia.com/en-us/products/workstations/dgx-spark/)
 - [NVIDIA 论坛讨论](https://forums.developer.nvidia.com/t/it-takes-6-minutes-for-minimax-h3-to-generate-a-5-second-480p-video-on-dgx-spark-how-long-does-it-take-for-yours/379139)
+
+---
+
+## 🙏 致谢
+
+特别感谢 [@JasonShao](https://gitee.com/wltiger) 提交的 [issue #IK9PZK](https://gitee.com/alexlu0912_admin/dgxspark_comfyui_minimax_h3/issues/IK9PZK)，指出了部署脚本中的三个问题：
+
+1. `install_wizard.py` — 模型下载被硬超时（`timeout=600`/`7200`）强杀（已修复：`timeout=None`）
+2. `install_wizard.py` — 复制 `sol_attn/` 子目录时触发 `IsADirectoryError`（已修复：改为递归复制）
+3. `deploy_from_scratch.sh` — 模块路径 `python -m huggingface_hub.cli.hf` 不存在（已修复：改用 `snapshot_download`）
+
+三处均已修复并随 commit `1a0362a` 发布。再次感谢详尽的报告与已验证的修复方案！🙏
 
 ---
 
