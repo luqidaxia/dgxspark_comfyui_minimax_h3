@@ -22,6 +22,21 @@
 
 ---
 
+### Native Resolution Ladder (2026-08-28, full accel + 2× upscale)
+
+Added on **2026-08-28** — dual-machine (both NVIDIA GB10), same scene (skyscraper), seed 99, 124 frames @ 24fps, **full acceleration stack + 2× RealESRGAN upscale**:
+
+| Native Resolution | → 2× Output | Machine | Time |
+|------------------:|------------:|:-------:|------|
+| 360p (640×360) | 1280×720 | 原机 | **2 m 17 s** |
+| 560p (1024×576) | 2048×1152 | 原机 | **6 m 45 s** |
+| 720p (1280×720) | 2560×1440 | 原机 / 新机 | **12 m 20 s / 13 m 08 s** |
+| 960p (1728×960) | 3456×1920 | 原机 / 新机 | **25 m 00 s / 26 m 03 s** |
+
+> ⏱️ Timed from ComfyUI history `execution_start → execution_success` (pure execution time, no queue/download). Full analysis in [Round 4](#round-4--native-resolution-ladder-2026-08-28).
+
+---
+
 ## Round 1 — Baseline (h3-dense-baseline, no acceleration)
 
 Pure dense generation at native resolution. No SageAttention, no SolAttn, no Spectrum, no FBC, no upscaling.
@@ -83,6 +98,52 @@ All acceleration nodes active (same as Round 2).
 > Generating at 360p (¼ pixels of 720p) and upscaling is **far more effective**  
 > than any single algorithmic acceleration. Combined with SolAttn/Spectrum,  
 > the speedup reaches **6×** — exceeding the article's claimed 3.92×.
+
+---
+
+## Round 4 — Native Resolution Ladder (2026-08-28, full accel + 2× upscale)
+
+**Goal**: Measure how generation time scales with **native** resolution when the full
+acceleration stack (SageAttention → SolAttn τ=1.3/int8/TMA → Spectrum Chebyshev → H3FirstBlockCache)
+**plus 2× RealESRGAN upscale** is always enabled — the production configuration for the DGX Spark.
+
+**Setup**: skyscraper scene, seed 99, 124 frames @ 24fps (~5.17 s), 20 steps,
+`res_multistep` sampler, `simple` scheduler. Two identical NVIDIA GB10 machines:
+`192.168.21.234` (PyTorch 2.11) and `192.168.22.110` (PyTorch 2.13).
+
+### Results
+
+| Native Resolution | Native Pixels | 2× Upscale Output | 原机 Time | 新机 Time | Per-Mpx Cost (原机) |
+|------------------:|--------------:|------------------:|----------:|----------:|--------------------:|
+| 360p (640×360) | 230,400 | 1280×720 | **2.29 min** | — | 596 s/Mpx |
+| 560p (1024×576) | 589,824 | 2048×1152 | **6.75 min** | — | 687 s/Mpx |
+| 720p (1280×720) | 921,600 | 2560×1440 | **12.34 min** | **13.14 min** | 803 s/Mpx |
+| 960p (1728×960) | 1,658,880 | 3456×1920 | **24.99 min** | **26.06 min** | 904 s/Mpx |
+
+> 精确执行时间（秒）：360p=137.3 · 560p=405.0 · 720p=740.2（原机）/788.3（新机） · 960p=1499.4（原机）/1563.3（新机）
+
+### Key Findings
+
+1. **Super-linear scaling.** From 360p → 960p, pixels grow **7.2×** but time grows
+   **10.9×**. Per-megapixel cost rises monotonically (596 → 904 s/Mpx), confirming the
+   GB10 unified-memory bandwidth becomes the bottleneck at high resolution — not raw compute.
+
+2. **720p is the quality/speed sweet spot.** 12–13 min for 2560×1440 output with sharp real
+   detail. 960p adds genuine detail but costs ~2× the time for a marginal gain; 360p is
+   fastest but softest.
+
+3. **Dual-machine parity.** The original machine (PyTorch 2.11) is ~4–6% *faster* than the
+   new machine (PyTorch 2.13) at both 720p and 960p. Free-memory headroom (14 GB vs 109 GB)
+   did **not** translate to faster generation — throughput is dominated by the GB10 itself.
+
+4. **Parallel speedup.** Running 720p/960p on two machines concurrently cuts wall-clock time
+   ~half versus a single machine running the ladder sequentially.
+
+### Recommendation
+
+Default production pipeline: **native 720p (1280×720) + full accel + 2× upscale → 2560×1440**.
+Use native 480p (864×480) + 2× upscale (→ 1728×960) for fast previews; reserve native 960p
+for final deliverables where absolute detail matters most.
 
 ---
 

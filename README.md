@@ -18,6 +18,17 @@ Single DGX Spark (GB10), ComfyUI v0.30.1, 20 steps, 124 frames (~5.17s @24fps).
 | Sol Engine (same stack) | 720p | **9 m 00 s** | 1.62× |
 | 🔥 **Sol Engine + 2× Upscale** (half-res gen) | 360p → 720p | **2 m 25 s** 🚀 | **6.03×** |
 
+**Native resolution ladder** (2026-08-28, full accel + 2× upscale, skyscraper scene, seed 99, 124 frames):
+
+| Native | → 2× Output | 原机 | 新机 |
+|---|---|---|---|
+| 360p (640×360) | 1280×720 | **2 min 17 s** | — |
+| 560p (1024×576) | 2048×1152 | **6 min 45 s** | — |
+| 720p (1280×720) | 2560×1440 | **12 min 20 s** | 13 min 08 s |
+| 960p (1728×960) | 3456×1920 | **25 min 00 s** | 26 min 03 s |
+
+> ⏱️ Scaling is super-linear (360p→960p: 7.2× pixels, 10.9× time). **720p is the quality/speed sweet spot**; both GB10 machines land within ~4–6% of each other.
+
 > 💡 **Key insight**: Generate at 640×360 then RealESRGAN 2× upscale to 720p — **6× faster** than direct 720p generation, exceeding the reference article's 3.92×.
 
 📊 [Full report → BENCHMARK.md](BENCHMARK.md)
@@ -320,6 +331,17 @@ All three have been fixed and shipped in commit `1a0362a`. Thanks again for the 
 | Sol Engine（SageAttn + SolAttn + Spectrum + FBC） | 480p | **3 分 30 秒** | 1.36× |
 | Sol Engine（同上） | 720p | **9 分 00 秒** | 1.62× |
 | 🔥 **Sol Engine + 2× 超分**（半分辨率生成） | 360p → 720p | **2 分 25 秒** 🚀 | **6.03×** |
+
+**原生分辨率梯度**（2026-08-28，全加速 + 2× 超分，摩天大楼场景，seed 99，124 帧）：
+
+| 原生分辨率 | → 2× 超分输出 | 原机 | 新机 |
+|---|---|---|---|
+| 360p (640×360) | 1280×720 | **2 分 17 秒** | — |
+| 560p (1024×576) | 2048×1152 | **6 分 45 秒** | — |
+| 720p (1280×720) | 2560×1440 | **12 分 20 秒** | 13 分 08 秒 |
+| 960p (1728×960) | 3456×1920 | **25 分 00 秒** | 26 分 03 秒 |
+
+> ⏱️ 耗时随分辨率超线性增长（360p→960p：像素 7.2×、时间 10.9×）。**720p 是速度/质量平衡点**；两台 GB10 性能相差仅约 4–6%。
 
 > 💡 **关键发现**：以 640×360 半分辨率生成，再用 RealESRGAN 2× 超分到 720p，比直接 720p 生成快 **6 倍**，超越参考文章的 3.92×。
 
