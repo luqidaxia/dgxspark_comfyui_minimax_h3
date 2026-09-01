@@ -1,6 +1,6 @@
 # DGX Spark ComfyUI + MiniMax H3 — One-Click Deploy
 
-[🇨🇳 中文版](#中文版) | [📊 Benchmark](BENCHMARK.md) | [🎬 I2V 图生视频](I2V.md) | [🔄 Gitee Mirror](https://gitee.com/alexlu0912_admin/dgxspark_comfyui_minimax_h3) | [🐙 GitHub](https://github.com/luqidaxia/dgxspark_comfyui_minimax_h3)
+[🇨🇳 中文版](#中文版) | [📊 Benchmark](BENCHMARK.md) | [📊 中文 Benchmark](BENCHMARK.zh-CN.md) | [🎬 I2V 图生视频](I2V.md) | [🔄 Gitee Mirror](https://gitee.com/alexlu0912_admin/dgxspark_comfyui_minimax_h3) | [🐙 GitHub](https://github.com/luqidaxia/dgxspark_comfyui_minimax_h3)
 
 One-click deploy MiniMax H3 video generation on a single NVIDIA DGX Spark (GB10).
 
@@ -40,7 +40,7 @@ Single DGX Spark (GB10), ComfyUI v0.30.1, 20 steps, 124 frames (~5.17s @24fps).
 
 > 💡 **Key insight**: Generate at 640×360 then RealESRGAN 2× upscale to 720p — **6× faster** than direct 720p generation, exceeding the reference article's 3.92×.
 
-📊 [Full report → BENCHMARK.md](BENCHMARK.md)
+📊 [Full report → BENCHMARK.md](BENCHMARK.md) · [中文报告 → BENCHMARK.zh-CN.md](BENCHMARK.zh-CN.md)
 
 ---
 
@@ -323,7 +323,7 @@ All three have been fixed and shipped in commit `1a0362a`. Thanks again for the 
 
 # DGX Spark 一键部署 ComfyUI + MiniMax H3
 
-[English](#dgx-spark-comfyui--minimax-h3--one-click-deploy) | [📊 测速报告](BENCHMARK.md) | [🎬 I2V 图生视频](I2V.md) | [🌐 GitHub Mirror](https://github.com/luqidaxia/dgxspark_comfyui_minimax_h3) | [Gitee 仓库](https://gitee.com/alexlu0912_admin/dgxspark_comfyui_minimax_h3)
+[English](#dgx-spark-comfyui--minimax-h3--one-click-deploy) | [📊 测速报告](BENCHMARK.zh-CN.md) | [📊 English Benchmark](BENCHMARK.md) | [🎬 I2V 图生视频](I2V.md) | [🌐 GitHub Mirror](https://github.com/luqidaxia/dgxspark_comfyui_minimax_h3) | [Gitee 仓库](https://gitee.com/alexlu0912_admin/dgxspark_comfyui_minimax_h3)
 
 在单台 NVIDIA DGX Spark (GB10) 上一键部署 MiniMax H3 视频生成环境。
 
@@ -354,7 +354,7 @@ All three have been fixed and shipped in commit `1a0362a`. Thanks again for the 
 
 > 💡 **关键发现**：以 640×360 半分辨率生成，再用 RealESRGAN 2× 超分到 720p，比直接 720p 生成快 **6 倍**，超越参考文章的 3.92×。
 
-📊 [完整报告 → BENCHMARK.md](BENCHMARK.md)
+📊 [完整报告 → BENCHMARK.zh-CN.md](BENCHMARK.zh-CN.md) · [English → BENCHMARK.md](BENCHMARK.md)
 
 ---
 
