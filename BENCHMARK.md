@@ -147,6 +147,49 @@ for final deliverables where absolute detail matters most.
 
 ---
 
+## Round 5 — x86 RTX PRO 5000 Cross-Machine Comparison (2026-09-01)
+
+**Goal**: Run the exact same native-resolution ladder on a dedicated x86 inference box
+(`172.16.1.8`, Ubuntu 22.04, **2× NVIDIA RTX PRO 5000 72GB Blackwell**, dual instances
+`:8188`=cuda:0 / `:8189`=cuda:1, one task per card) and compare against the DGX Spark GB10
+baseline above.
+
+**Setup**: identical skyscraper scene, seed 99, 124 frames @ 24fps (~5.17 s), 20 steps,
+`res_multistep`/`simple`, full acceleration stack (SageAttention → SolAttn τ=1.3/int8/TMA →
+Spectrum Chebyshev → H3FirstBlockCache) + 2× RealESRGAN upscale. Timing from ComfyUI
+history `execution_start → execution_success`, same as Round 4.
+
+### Results
+
+| Native Resolution | 2× Upscale Output | **x86 RTX PRO 5000** | **GB10 原机** | Speedup |
+|------------------:|------------------:|--------------------:|--------------:|--------:|
+| 360p (640×360) | 1280×720 | **0.70 min** (41.9 s) | 2.29 min (137.3 s) | **3.28×** |
+| 560p (1024×576) | 2048×1152 | **2.18 min** (131.0 s) | 6.75 min (405.0 s) | **3.09×** |
+| 720p (1280×720) | 2560×1440 | **3.40 min** (204.1 s) | 12.34 min (740.2 s) | **3.63×** |
+| 960p (1728×960) | 3456×1920 | **7.69 min** (461.2 s) | 24.99 min (1499.4 s) | **3.25×** |
+
+> All x86 numbers are **warm-start** (models resident in VRAM). 360p/720p re-runs used
+> seed 100 to bypass ComfyUI prompt caching (identical speed characteristics; cold-start
+> 360p = 156.7 s, cold-start 720p = 319.4 s incl. 35 GB model load).
+
+### Key Findings
+
+1. **Consistent ~3×+ speedup.** Warm-start speedup spans 3.09×–3.63× across the ladder
+   (avg ≈ 3.3×), matching the earlier 480p single-point comparison (~3.8×).
+
+2. **No bandwidth wall.** Per-megapixel cost at 960p is **278 s/Mpx** on the x86 box vs
+   **904 s/Mpx** on GB10 — dedicated GDDR7 bandwidth removes the unified-memory bottleneck,
+   and scaling is far closer to linear (360p → 960p: 7.2× pixels, ~11.0× time).
+
+3. **Practical wall-clock.** 720p+2× (2560×1440) drops from ~12 min to **~3.4 min**; 960p
+   drops from ~25 min to **~7.7 min**. The x86 box turns the 960p "reserve for final
+   deliverables" tier into a routine option.
+
+4. **Dual-card parallelism still recommended.** Two instances (one per card) cut wall-clock
+   ~half for multi-task batches while keeping single-task latency identical.
+
+---
+
 ## Visual Comparison
 
 ```

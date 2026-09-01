@@ -27,6 +27,15 @@ Single DGX Spark (GB10), ComfyUI v0.30.1, 20 steps, 124 frames (~5.17s @24fps).
 | 720p (1280×720) | 2560×1440 | **12 min 20 s** | 13 min 08 s |
 | 960p (1728×960) | 3456×1920 | **25 min 00 s** | 26 min 03 s |
 
+**Cross-machine comparison** (2026-09-01, x86 box: 2× RTX PRO 5000 72GB, same workflow/stack, warm-start):
+
+| Native | → 2× Output | x86 RTX PRO 5000 | GB10 原机 | Speedup |
+|---|---|---|---|---|
+| 360p (640×360) | 1280×720 | **0 min 42 s** | 2 min 17 s | **3.28×** |
+| 560p (1024×576) | 2048×1152 | **2 min 11 s** | 6 min 45 s | **3.09×** |
+| 720p (1280×720) | 2560×1440 | **3 min 24 s** | 12 min 20 s | **3.63×** |
+| 960p (1728×960) | 3456×1920 | **7 min 41 s** | 25 min 00 s | **3.25×** |
+
 > ⏱️ Scaling is super-linear (360p→960p: 7.2× pixels, 10.9× time). **720p is the quality/speed sweet spot**; both GB10 machines land within ~4–6% of each other.
 
 > 💡 **Key insight**: Generate at 640×360 then RealESRGAN 2× upscale to 720p — **6× faster** than direct 720p generation, exceeding the reference article's 3.92×.
