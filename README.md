@@ -44,6 +44,27 @@ Single DGX Spark (GB10), ComfyUI v0.30.1, 20 steps, 124 frames (~5.17s @24fps).
 
 ---
 
+## ⚠️ Known Issue: int8 model → black video on *some* GB10 units (2026-09-02)
+
+**Symptom**: with `minimax_h3_fl2va_pruned_int8_convrot.safetensors`, sampling output decodes to
+**fully black frames** (mean pixel ≈ 0) and the audio track encodes as NaN, on **some** DGX Spark
+(GB10) machines. Runs "succeed" (no error, valid file) but the video is black.
+
+**Scope**: machine-specific. The same venv / ComfyUI / model files / workflow run fine on other
+GB10 units of the same nominal model. Not caused by driver version (580.142 / 580.159.03 /
+580.173.02), kernel (6.17.0-1014/1022/1031), CUDA libs or model corruption — all verified
+identical bit-for-bit on affected and unaffected units; basic bf16/fp16/fp32 matmul/conv/attention
+numerics are also identical. fp8 model (`minimax_h3_fl2va_pruned_fp8_scaled.safetensors`) is
+**unaffected** on every machine tested. Root cause points to a GB10 silicon/stepping-dependent
+defect in the int8 dequant kernel path.
+
+**Workaround**: on affected machines use the `*_fp8.json` workflow variants (same params,
+UNETLoader points to `minimax_h3_fl2va_pruned_fp8_scaled.safetensors`) — e.g.
+`workflows/x86_ladder/360p_fp8.json`. int8 remains fine on unaffected machines.
+To check a machine: submit any workflow with `steps=1` and inspect whether decoded frames are black.
+
+---
+
 ## Deployment Options
 
 | Plan | Script | When to use | Data source | Time |
@@ -355,6 +376,16 @@ All three have been fixed and shipped in commit `1a0362a`. Thanks again for the 
 > 💡 **关键发现**：以 640×360 半分辨率生成，再用 RealESRGAN 2× 超分到 720p，比直接 720p 生成快 **6 倍**，超越参考文章的 3.92×。
 
 📊 [完整报告 → BENCHMARK.zh-CN.md](BENCHMARK.zh-CN.md) · [English → BENCHMARK.md](BENCHMARK.md)
+
+---
+
+## ⚠️ 已知问题：部分 GB10 上 int8 模型输出全黑视频（2026-09-02）
+
+**症状**：使用 `minimax_h3_fl2va_pruned_int8_convrot.safetensors` 时，采样结果解码为**纯黑画面**（平均像素≈0），且音轨编码为 NaN——发生在**部分** DGX Spark (GB10) 机器上。任务本身"成功"（无报错、文件有效），但视频全黑。
+
+**范围**：与具体机器相关。同一套 venv / ComfyUI / 模型 / workflow 在另一些同型号 GB10 上运行正常。**不是**驱动版本问题（580.142 / 580.159.03 / 580.173.02 均验证）、**不是**内核问题（6.17.0-1014/1022/1031 均验证）、也不是 CUDA 库或模型损坏（受影响与正常机器逐位一致；bf16/fp16/fp32 基础算子数值也完全一致）。fp8 模型（`minimax_h3_fl2va_pruned_fp8_scaled.safetensors`）在所有测试机器上**均正常**。根因指向部分 GB10 芯片（stepping/批次）的 int8 反量化 kernel 路径缺陷。
+
+**规避**：受影响机器改用 `*_fp8.json` workflow 变体（参数相同，UNETLoader 指向 `minimax_h3_fl2va_pruned_fp8_scaled.safetensors`），例如 `workflows/x86_ladder/360p_fp8.json`。未受影响机器可继续使用 int8。快速自检：提交任意 `steps=1` workflow，检查解码帧是否全黑。
 
 ---
 
